@@ -1,4 +1,5 @@
 --!strict
+--# selene: allow(unused_variable)
 local BaseState = {}
 BaseState.__index = BaseState
 
@@ -43,17 +44,17 @@ function BaseState.new(): BaseState
 	return setmetatable(self, BaseState) :: any
 end
 
-function BaseState:Init() end
+function BaseState.Init(self: BaseState) end
 
-function BaseState:Enter(target: PVInstance, filterDescendantsInstances)
+function BaseState.Enter(self: BaseState, target: PVInstance, filterDescendantsInstances)
 	self.Target = target
 	self.FilterDescendantsInstances = filterDescendantsInstances
 end
-function BaseState:Exit() end
-function BaseState:Update(cam: Camera, dt: number, mouseDelta: Vector2)
+function BaseState.Exit(self: BaseState) end
+function BaseState.Update(self: BaseState, cam: Camera, dt: number, mouseDelta: Vector2)
 	self:updateFOV(cam, dt)
 end
-function BaseState:updateFOV(cam: Camera, dt: number)
+function BaseState.updateFOV(self: BaseState, cam: Camera, dt: number)
 	if not self._lastFOV then
 		self._lastFOV = cam.FieldOfView
 	end
@@ -63,10 +64,10 @@ function BaseState:updateFOV(cam: Camera, dt: number)
 	self._lastFOV = newFOV
 end
 
-function BaseState:lerpVector(a: Vector3, b: Vector3, t: number, dt: number)
+function BaseState.lerpVector(self: BaseState, a: Vector3, b: Vector3, t: number, dt: number)
 	return a + (b - a) * (1 - (1 - t) ^ dt)
 end
-function BaseState:lerpDeltaTime(a: number, b: number, t: number, dt: number)
+function BaseState.lerpDeltaTime(self: BaseState, a: number, b: number, t: number, dt: number)
 	return a + (b - a) * (1 - (1 - t) ^ dt)
 end
 

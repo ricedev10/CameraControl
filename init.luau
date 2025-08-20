@@ -7,10 +7,10 @@ can set it CameraService.Mode
 FocusPart Attributes:
 	CameraMode: string [the name of the CameraMode to set when focused at part]
 ]]
-
 local OrbitalState = require(script.OrbitalState)
 local TopDownState = require(script.TopDown)
 local BaseState = require(script.BaseState)
+local FirstPersonState = require(script.FirstPersonState)
 
 local CameraService: CameraService = {} :: CameraService
 CameraService.Mode = TopDownState
@@ -48,6 +48,7 @@ export type CameraService = {
 	CameraMode: {
 		Orbital: OrbitalState.Orbital,
 		TopDown: TopDownState.TopDown,
+		FirstPersonState: FirstPersonState.FirstPersonState,
 	},
 
 	-- Methods
@@ -71,9 +72,6 @@ export type CameraService = {
 	_lastTopDownPosition: Vector3,
 
 	_run: RBXScriptConnection?,
-
-	_orbital: (self: CameraService, camera: Camera, deltaTime: number, mouseDelta: Vector2) -> (),
-	_topDown: (self: CameraService, camera: Camera, deltaTime: number) -> (),
 }
 -- type CameraMode = OrbitalState.Orbital & TopDownState.TopDown
 
@@ -85,8 +83,8 @@ CameraService._seeThroughParts = {}
 CameraService._currentTopDownAngle = Vector3.zero
 CameraService.CameraMode = {
 	Orbital = OrbitalState,
-	-- Fixed = "Fixed",
 	TopDown = TopDownState,
+	FirstPersonState = FirstPersonState,
 }
 
 do -- initialize CameraModes
@@ -119,7 +117,6 @@ function CameraService:Update(dt: number, mouseDelta: Vector2)
 
 	self.Mode:Update(camera, dt, mouseDelta)
 	self._lastMode = self.Mode
-	camera.Focus = CFrame.new(self.Target:GetPivot().Position)
 end
 
 function CameraService:ZoomIn(amount: number)

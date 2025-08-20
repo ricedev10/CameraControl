@@ -32,7 +32,7 @@ end
 
 function TopDown:Exit() end
 
-function TopDown:Update(cam: Camera, dt: number, mouseDelta: Vector2)
+function TopDown:Update(cam: Camera, dt: number, _mouseDelta: Vector2)
 	local Target = self.Target
 	if not Target then
 		warn("No camera update; Target not found")

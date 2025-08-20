@@ -6,24 +6,18 @@ This package offers mainly flexibility but also ease of use. As an example, see 
 -- Local PlayerScript
 local CameraControl = require(path.to.CameraControl)
 local RunService = game:GetService("RunService")
-local Client = game:GetService("Players").Player
+local UserInputService = game:GetService("UserInputService")
+local Client = game:GetService("Players").LocalPlayer
 
 RunService.PreRender:Connect(function(dt)
-	if UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
-		UserInputService.MouseBehavior = Enum.MouseBehavior.LockCurrentPosition
-	else
-		UserInputService.MouseBehavior = Enum.MouseBehavior.Default
-	end
-
 	CameraControl:Update(dt, UserInputService:GetMouseDelta())
 end)
 
-local function onCharacterAdded()
+local function onCharacterAdded(character: Model)
 	CameraControl.Mode = CameraControl.CameraMode.Orbital
 
 	CameraControl.FilterDescendantsInstances = { character }
 	CameraControl.Target = character
-	warn(character, CameraControl.Target)
 end
 
 

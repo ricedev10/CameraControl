@@ -1,6 +1,7 @@
 --!strict
 local BaseState = require(script.Parent.BaseState)
 local OribtalState: Orbital = BaseState.new() :: Orbital
+local UserInputService = game:GetService("UserInputService")
 
 export type Orbital = BaseState.BaseState<{
 	RotationSensitivity: number,
@@ -77,6 +78,14 @@ function OribtalState.Update(self: Orbital, cam: Camera, dt: number, mouseDelta:
 	-- update FOV
 	self:updateFOV(cam, dt)
 
+	-- update mouse lock
+	if UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
+		UserInputService.MouseBehavior = Enum.MouseBehavior.LockCurrentPosition
+	else
+		UserInputService.MouseBehavior = Enum.MouseBehavior.Default
+	end
+
+	-- update camera cframe
 	if didUpdateZoom then
 		newCF = CFrame.new(Focus.Position) * CFrame.fromOrientation(newRotation.Y / mult, newRotation.X / mult, 0)
 		newCF = CFrame.lookAt((newCF + newCF.LookVector * self._currentZoom).Position, Focus.Position)

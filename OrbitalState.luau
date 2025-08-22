@@ -17,22 +17,6 @@ export type Orbital = BaseState.BaseState<{
 	_currentDelta: Vector2,
 	_currentZoom: number,
 }>
---[[ export type OribtalState = {
-	Init: (self: OribtalState, target: PVInstance) -> (),
-	Enter: (self: OribtalState) -> (),
-	Exit: (self: OribtalState) -> (),
-	Update: (self: OribtalState, cam: Camera, dt: number, mouseDelta: Vector2) -> (),
-
-	Target: PVInstance,
-
-	RotationSensitivity: number,
-	RotationReleaseSpeed: number,
-	RotationSpeed: number,
-	Zoom: number,
-
-	_targetDelta: Vector2,
-	_currentDelta: Vector2,
-} ]]
 
 function OribtalState.Init(self: Orbital)
 	self.RotationSensitivity = 0.99

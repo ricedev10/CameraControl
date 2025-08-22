@@ -7,7 +7,8 @@ export type FirstPersonState = BaseState.BaseState<{
 	RotationSensitivity: number,
 	RotationReleaseSpeed: number,
 	RotationSpeed: number,
-	RotationLimit: number,
+	MinRotationLimit: number,
+	MaxRotationLimit: number,
 
 	ZoomSpeed: number,
 	Zoom: number,
@@ -24,8 +25,9 @@ function FirstPersonState.Init(self: FirstPersonState)
 	self.RotationReleaseSpeed = 0.99
 	self.RotationSpeed = 0.99
 	self.ZoomSpeed = 0.99
-	self.RotationLimit = 89 -- angle rotation limit (in degrees) along the x-axis (turning head up/down)
-	self.FOV = 80
+	self.MinRotationLimit = -60 -- angle rotation limit (in degrees) along the x-axis (turning head up/down)
+	self.MaxRotationLimit = 89
+	self.FOV = 90
 	self.Zoom = 10
 
 	self._targetDelta = Vector2.zero
@@ -50,6 +52,13 @@ function FirstPersonState.Update(self: FirstPersonState, cam: Camera, dt: number
 		return
 	end
 
+	-- set parts "visible"
+	for _, v in Target:GetDescendants() do
+		if v:IsA("BasePart") then
+			v.LocalTransparencyModifier = 0
+		end
+	end
+
 	-- calculate new CFrame
 	local Focus = Target.PrimaryPart.CFrame
 	local newCF = CFrame.identity
@@ -58,7 +67,7 @@ function FirstPersonState.Update(self: FirstPersonState, cam: Camera, dt: number
 	local delta = mouseDelta * self.RotationSensitivity
 	self._targetDelta = Vector2.new(
 		self._targetDelta.X - delta.X,
-		math.clamp(self._targetDelta.Y + delta.Y, -self.RotationLimit, self.RotationLimit)
+		math.clamp(self._targetDelta.Y + delta.Y, -self.MaxRotationLimit, -self.MinRotationLimit)
 	)
 
 	local newRotation = self._currentDelta:Lerp(
@@ -68,12 +77,11 @@ function FirstPersonState.Update(self: FirstPersonState, cam: Camera, dt: number
 	self._currentDelta = newRotation
 
 	-- set CFrame
-	local focusOrientation = Focus - Focus.Position
 	local mult = 180 / math.pi
 	newCF = CFrame.new(Focus.Position) * CFrame.fromOrientation(newRotation.Y / mult, newRotation.X / mult, 0)
 	newCF = CFrame.lookAt((newCF + newCF.LookVector * self._currentZoom).Position, Focus.Position)
 
-	local headFront = head.CFrame * CFrame.new(0, 0.2, -head.Size.Z / 2)
+	local headFront = head.CFrame * CFrame.new(0, 0, -head.Size.Z / 2 + 0.5)
 	local offset = (headFront.Position - newCF.Position)
 	newCF += offset
 	newFocus = cam.Focus + offset
@@ -90,7 +98,7 @@ function FirstPersonState.Update(self: FirstPersonState, cam: Camera, dt: number
 	UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
 end
 
-function FirstPersonState.updateZoom(self: FirstPersonState, newCF: CFrame, cam: Camera, dt: number)
+function FirstPersonState.updateZoom(self: FirstPersonState, _newCF: CFrame, _cam: Camera, dt: number)
 	-- transition to newZoom
 	local newZoom = self:lerpDeltaTime(self._currentZoom, self.Zoom, self.ZoomSpeed, dt)
 	local changed = math.abs(newZoom - self._currentZoom) >= 0.05
